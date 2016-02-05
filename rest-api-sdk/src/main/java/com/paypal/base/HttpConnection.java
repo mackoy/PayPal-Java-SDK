@@ -140,12 +140,17 @@ public abstract class HttpConnection {
 						}
 						break retryLoop;
 					} else if (responsecode >= 300 && responsecode < 500) {
-						reader = new BufferedReader(new InputStreamReader(
-								connection.getErrorStream(),
-								Constants.ENCODING_FORMAT));
-						errorResponse = read(reader);
-						String msg = "Response code: " + responsecode + "\tError response: " + errorResponse;
-						throw new ClientActionRequiredException(responsecode, errorResponse, msg, new IOException(msg));
+						InputStream errorStream = connection.getErrorStream();
+						if (errorStream != null){
+							reader = new BufferedReader(new InputStreamReader(
+									connection.getErrorStream(),
+									Constants.ENCODING_FORMAT));
+							errorResponse = read(reader);
+							String msg = "Response code: " + responsecode + "\tError response: " + errorResponse;
+							throw new ClientActionRequiredException(responsecode, errorResponse, msg, new IOException(msg));
+						} else {
+							throw new ClientActionRequiredException(responsecode, "{ \"error\": \"Authentication Error\", \"message\": \"Try to get a new accessToken!\"}", "Authentication-Error", new IOException(""));
+						}
 					} else if (responsecode >= 500) {
 						reader = new BufferedReader(new InputStreamReader(
 								connection.getErrorStream(),

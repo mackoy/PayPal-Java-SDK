@@ -160,7 +160,8 @@ public final class OAuthTokenCredential implements ICredential {
 	 * @return remaining lifetime of this access token in seconds
 	 */
 	public long expiresIn() {
-		return expires - new java.util.Date().getTime() / 1000;
+		long result = expires - new java.util.Date().getTime() / 1000;
+		return result;
 	}
 
 	private String generateAccessToken() throws PayPalRESTException {
